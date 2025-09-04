@@ -1,0 +1,26 @@
+@baseUrl = http://localhost:3000
+
+### Get
+GET {{baseUrl}}/
+
+### Post
+POST {{baseUrl}}/inserir
+Content-Type: application/json
+
+{
+    "nome": "Jã"
+}
+
+### Delete
+DELETE {{baseUrl}}/deletar/68b8cc0a803ed94ea46fe8f0
+
+### Put
+PUT {{baseUrl}}/alterar/68b8d04442da5a5d67497c58
+content-type: application/json
+
+{
+    "nome": "Jãozinho"
+}
+
+### Get by id
+GET {{baseUrl}}/68b8d04442da5a5d67497c58
