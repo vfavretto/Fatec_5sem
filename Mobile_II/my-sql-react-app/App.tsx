@@ -1,12 +1,16 @@
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import Createbank from './data/sqlite';
+import createDatabase, { createTable, insertData } from './data/sqlite';
 
 export default function App() {
 
   const Main = async () => {
-    const db = await Createbank();
+    const db = await createDatabase();
+    if (db) {
+      createTable(db);
+      insertData(db, 'John Doe', 'john.doe@example.com');
+    }
   }
 
   useEffect(() => {
