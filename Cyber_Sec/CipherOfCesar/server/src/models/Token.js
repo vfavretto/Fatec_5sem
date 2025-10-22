@@ -7,9 +7,18 @@ const tokenSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    method: {
+      type: String,
+      required: true,
+      default: 'caesar',
+      enum: ['caesar', 'rot13', 'base64', 'atbash']
+    },
     shift: {
       type: Number,
-      required: true,
+      required: function() {
+        return this.method === 'caesar';
+      },
+      default: 3,
     },
     used: {
       type: Boolean,

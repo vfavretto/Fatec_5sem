@@ -7,25 +7,46 @@ export default {
   theme: {
     extend: {
       colors: {
-        rose: {
-          light: '#F2BBC9',
-          DEFAULT: '#F2BBC9',
+        primary: {
+          DEFAULT: '#F2A922',
+          light: '#F2A922',
         },
+        secondary: {
+          DEFAULT: '#F25D07',
+          light: '#F25D07',
+        },
+        accent: {
+          DEFAULT: '#A66E4E',
+          light: '#A66E4E',
+        },
+        error: {
+          DEFAULT: '#8C1D04',
+          light: '#8C1D04',
+        },
+        dark: {
+          DEFAULT: '#201B26',
+          bg: '#201B26',
+        },
+        // Aliases para compatibilidade
         lavender: {
-          light: '#AFA9D9',
-          DEFAULT: '#AFA9D9',
-        },
-        slate: {
-          blue: '#8082A6',
-          DEFAULT: '#8082A6',
-        },
-        navy: {
-          dark: '#282E40',
-          DEFAULT: '#282E40',
+          DEFAULT: '#F2A922',
+          light: '#F2A922',
         },
         peach: {
-          light: '#F2A172',
-          DEFAULT: '#F2A172',
+          DEFAULT: '#F25D07',
+          light: '#F25D07',
+        },
+        slate: {
+          blue: '#A66E4E',
+          DEFAULT: '#A66E4E',
+        },
+        navy: {
+          dark: '#201B26',
+          DEFAULT: '#201B26',
+        },
+        rose: {
+          DEFAULT: '#8C1D04',
+          light: '#8C1D04',
         }
       },
       animation: {

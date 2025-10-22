@@ -22,10 +22,22 @@ export const authAPI = {
 };
 
 export const cipherAPI = {
-  encrypt: async (token, message, shift) => {
+  getMethods: async (token) => {
+    const response = await api.get(
+      '/cipher/methods',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  },
+
+  encrypt: async (token, message, shift, method = 'caesar') => {
     const response = await api.post(
       '/cipher/encrypt',
-      { message, shift },
+      { message, shift, method },
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -1,11 +1,11 @@
 const crypto = require('crypto');
 const Token = require('../models/Token');
-const { encrypt, decrypt } = require('../utils/caesar');
+const { encrypt, decrypt, getAvailableMethods } = require('../utils/cipherMethods');
 
-const generateHash = (message, shift, userId) => {
+const generateHash = (message, method, shift, userId) => {
   const hash = crypto
     .createHash('sha256')
-    .update(`${userId}:${shift}:${message}:${Date.now()}`)
+    .update(`${userId}:${method}:${shift}:${message}:${Date.now()}`)
     .digest('hex');
 
   return hash;
@@ -13,23 +13,34 @@ const generateHash = (message, shift, userId) => {
 
 const encryptMessage = async (req, res) => {
   try {
-    const { message, shift } = req.body;
+    const { message, shift, method = 'caesar' } = req.body;
     const userId = req.user.id;
 
     if (typeof message !== 'string' || message.trim() === '') {
       return res.status(400).json({ message: 'Message is required' });
     }
 
-    if (!Number.isInteger(shift)) {
-      return res.status(400).json({ message: 'Shift must be an integer' });
+    const validMethods = ['caesar', 'rot13', 'base64', 'atbash'];
+    if (!validMethods.includes(method)) {
+      return res.status(400).json({ message: 'Invalid encryption method' });
     }
 
-    const encrypted = encrypt(message, shift);
-    const hash = generateHash(message, shift, userId);
+    if (method === 'caesar' && !Number.isInteger(shift)) {
+      return res.status(400).json({ message: 'Shift must be an integer for Caesar cipher' });
+    }
 
-    await Token.create({ hash, shift, owner: userId, used: false });
+    const encrypted = encrypt(message, method, shift || 3);
+    const hash = generateHash(message, method, shift || 0, userId);
 
-    res.json({ encrypted, hash });
+    await Token.create({ 
+      hash, 
+      method,
+      shift: method === 'caesar' ? shift : undefined, 
+      owner: userId, 
+      used: false 
+    });
+
+    res.json({ encrypted, hash, method });
   } catch (error) {
     console.error('Encrypt error:', error.message);
     res.status(500).json({ message: 'Internal server error' });
@@ -59,14 +70,24 @@ const decryptMessage = async (req, res) => {
       return res.status(400).json({ message: 'Hash already used' });
     }
 
-    const decrypted = decrypt(encrypted, token.shift);
+    const decrypted = decrypt(encrypted, token.method, token.shift || 3);
 
     token.used = true;
     await token.save();
 
-    res.json({ decrypted });
+    res.json({ decrypted, method: token.method });
   } catch (error) {
     console.error('Decrypt error:', error.message);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const listMethods = async (req, res) => {
+  try {
+    const methods = getAvailableMethods();
+    res.json({ methods });
+  } catch (error) {
+    console.error('List methods error:', error.message);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -74,6 +95,7 @@ const decryptMessage = async (req, res) => {
 module.exports = {
   encryptMessage,
   decryptMessage,
+  listMethods,
 };
 
 
