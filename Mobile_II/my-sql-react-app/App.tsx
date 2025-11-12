@@ -1,35 +1,39 @@
-import { useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import createDatabase, { createTable, insertData } from './data/sqlite';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { SelectedDatabaseProvider, useDatabase } from './src/context/DatabaseContext';
+import { SplashScreen } from './src/screens/SplashScreen';
+import { BookListScreen } from './src/screens/BookListScreen';
 
-export default function App() {
+function AppContent() {
+  const { selectedDatabase, isLoadingSelection } = useDatabase();
 
-  const Main = async () => {
-    const db = await createDatabase();
-    if (db) {
-      createTable(db);
-      insertData(db, 'John Doe', 'john.doe@example.com');
-    }
+  if (isLoadingSelection) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#2563EB" />
+      </View>
+    );
   }
 
-  useEffect(() => {
-    Main();
-  }, []);
-  
+  if (!selectedDatabase) {
+    return <SplashScreen />;
+  }
+
+  return <BookListScreen />;
+}
+
+export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SelectedDatabaseProvider>
+      <AppContent />
+    </SelectedDatabaseProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
-  },
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC'
+  }
 });
