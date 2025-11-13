@@ -10,18 +10,19 @@ import {
   Text,
   View
 } from 'react-native';
-import { BookForm } from '../components/BookForm';
-import { BookListItem } from '../components/BookListItem';
+import { AuthorForm } from '../components/AuthorForm';
+import { AuthorListItem } from '../components/AuthorListItem';
 import { useDatabase } from '../context/DatabaseContext';
-import { useBooks } from '../hooks/useBooks';
-import { Book, BookPayload } from '../types/book';
+import { useAuthors } from '../hooks/useAuthors';
+import { Author, AuthorPayload } from '../types/author';
 import { colors } from '../theme/colors';
 
-export function BookListScreen() {
-  const { selectedDatabase, clearSelection } = useDatabase();
-  const { books, isLoading, isSaving, error, refresh, addBook, editBook, removeBook } = useBooks(selectedDatabase);
+export function AuthorsScreen() {
+  const { selectedDatabase } = useDatabase();
+  const { authors, isLoading, isSaving, error, refresh, addAuthor, editAuthor, removeAuthor } =
+    useAuthors(selectedDatabase);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
 
   useEffect(() => {
     if (error) {
@@ -30,34 +31,34 @@ export function BookListScreen() {
   }, [error]);
 
   const handleCreate = () => {
-    setEditingBook(null);
+    setEditingAuthor(null);
     setIsFormVisible(true);
   };
 
-  const handleEdit = (book: Book) => {
-    setEditingBook(book);
+  const handleEdit = (author: Author) => {
+    setEditingAuthor(author);
     setIsFormVisible(true);
   };
 
-  const handleDelete = (book: Book) => {
-    Alert.alert('Confirmação', `Deseja excluir "${book.titulo}"?`, [
+  const handleDelete = (author: Author) => {
+    Alert.alert('Confirmação', `Deseja excluir "${author.nome}"?`, [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Excluir',
         style: 'destructive',
-        onPress: () => removeBook(book.id).catch(() => null)
+        onPress: () => removeAuthor(author.id).catch(() => null)
       }
     ]);
   };
 
-  const handleSubmit = async (payload: BookPayload) => {
-    if (editingBook) {
-      await editBook(editingBook.id, payload);
+  const handleSubmit = async (payload: AuthorPayload) => {
+    if (editingAuthor) {
+      await editAuthor(editingAuthor.id, payload);
     } else {
-      await addBook(payload);
+      await addAuthor(payload);
     }
     setIsFormVisible(false);
-    setEditingBook(null);
+    setEditingAuthor(null);
   };
 
   return (
@@ -65,53 +66,45 @@ export function BookListScreen() {
       <StatusBar style="dark" />
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Minha Estante</Text>
-          <Text style={styles.headerSubtitle}>
-            Banco selecionado:{' '}
-            <Text style={styles.driverHighlight}>{selectedDatabase === 'mongo' ? 'MongoDB' : 'SQLite'}</Text>
-          </Text>
+          <Text style={styles.headerTitle}>Autores</Text>
+          <Text style={styles.headerSubtitle}>Gerencie seus autores favoritos</Text>
         </View>
-        <View style={styles.headerButtons}>
-          <Pressable style={[styles.headerButton, styles.swapButton]} onPress={clearSelection}>
-            <Text style={[styles.headerButtonText, styles.swapButtonText]}>Trocar banco</Text>
-          </Pressable>
-          <Pressable style={[styles.headerButton, styles.addButton]} onPress={handleCreate}>
-            <Text style={styles.headerButtonText}>Novo livro</Text>
-          </Pressable>
-        </View>
+        <Pressable style={[styles.headerButton, styles.addButton]} onPress={handleCreate}>
+          <Text style={styles.headerButtonText}>Novo autor</Text>
+        </Pressable>
       </View>
 
       <FlatList
-        data={books}
+        data={authors}
         keyExtractor={(item) => item.id}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
-        contentContainerStyle={books.length === 0 ? styles.emptyContent : styles.listContent}
+        contentContainerStyle={authors.length === 0 ? styles.emptyContent : styles.listContent}
         renderItem={({ item }) => (
-          <BookListItem book={item} onEdit={handleEdit} onDelete={handleDelete} />
+          <AuthorListItem author={item} onEdit={handleEdit} onDelete={handleDelete} />
         )}
         ListEmptyComponent={
           isLoading ? (
             <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
           ) : (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>Nenhum livro cadastrado</Text>
+              <Text style={styles.emptyTitle}>Nenhum autor cadastrado</Text>
               <Text style={styles.emptySubtitle}>
-                Adicione novos livros para acompanhar suas leituras e planejamentos.
+                Adicione autores para acompanhar suas obras e biografias.
               </Text>
               <Pressable style={[styles.headerButton, styles.addButton]} onPress={handleCreate}>
-                <Text style={styles.headerButtonText}>Cadastrar primeiro livro</Text>
+                <Text style={styles.headerButtonText}>Cadastrar primeiro autor</Text>
               </Pressable>
             </View>
           )
         }
       />
 
-      <BookForm
+      <AuthorForm
         visible={isFormVisible}
-        initialBook={editingBook}
+        initialAuthor={editingAuthor}
         onClose={() => {
           setIsFormVisible(false);
-          setEditingBook(null);
+          setEditingAuthor(null);
         }}
         onSubmit={handleSubmit}
         isSubmitting={isSaving}
@@ -143,28 +136,14 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 15
   },
-  driverHighlight: {
-    fontWeight: '700',
-    color: colors.primary
-  },
-  headerButtons: {
-    alignItems: 'flex-end'
-  },
   headerButton: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 12,
-    marginBottom: 8
+    borderRadius: 12
   },
   headerButtonText: {
     fontWeight: '600',
     color: colors.surface
-  },
-  swapButton: {
-    backgroundColor: colors.surfaceAlt
-  },
-  swapButtonText: {
-    color: colors.text
   },
   addButton: {
     backgroundColor: colors.primary
@@ -189,7 +168,8 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     textAlign: 'center',
     color: colors.textSecondary,
-    marginVertical: 12
+    marginVertical: 12,
+    marginBottom: 20
   }
 });
 

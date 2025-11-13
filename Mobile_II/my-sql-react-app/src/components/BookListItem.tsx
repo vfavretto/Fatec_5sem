@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Book } from '../types/book';
+import { colors } from '../theme/colors';
 
 type Props = {
   book: Book;
@@ -40,14 +41,14 @@ export function BookListItem({ book, onEdit, onDelete }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 14,
     padding: 16,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
+    borderWidth: 2,
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
+    shadowOpacity: 0.1,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
     elevation: 3
@@ -60,13 +61,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: colors.text,
     flex: 1,
     marginRight: 8
   },
   author: {
     marginTop: 6,
-    color: '#4B5563',
+    color: colors.textSecondary,
     fontSize: 15
   },
   statusChip: {
@@ -75,14 +76,14 @@ const styles = StyleSheet.create({
     borderRadius: 999
   },
   statusChipSuccess: {
-    backgroundColor: '#DCFCE7'
+    backgroundColor: '#D4EDDA',
   },
   statusChipInfo: {
-    backgroundColor: '#DBEAFE'
+    backgroundColor: '#D1ECF1',
   },
   statusChipText: {
-    fontWeight: '600',
-    color: '#1F2937',
+    fontWeight: '700',
+    color: colors.text,
     textTransform: 'capitalize'
   },
   footer: {
@@ -96,13 +97,13 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   ratingLabel: {
-    color: '#6B7280',
+    color: colors.textMuted,
     marginRight: 6,
     fontSize: 14
   },
   ratingValue: {
     fontWeight: '700',
-    color: '#111827',
+    color: colors.secondary,
     fontSize: 16
   },
   actions: {
@@ -115,20 +116,20 @@ const styles = StyleSheet.create({
     marginLeft: 8
   },
   editButton: {
-    backgroundColor: '#EFF6FF'
+    backgroundColor: colors.primary,
   },
   deleteButton: {
-    backgroundColor: '#FEE2E2'
+    backgroundColor: colors.error,
   },
   actionText: {
     fontSize: 14,
-    fontWeight: '600'
+    fontWeight: '700'
   },
   editText: {
-    color: '#1D4ED8'
+    color: colors.surface
   },
   deleteText: {
-    color: '#DC2626'
+    color: colors.surface
   }
 });
 

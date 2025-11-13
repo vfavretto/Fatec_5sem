@@ -10,6 +10,7 @@ import {
   View
 } from 'react-native';
 import { Book, BookPayload, BookStatus } from '../types/book';
+import { colors } from '../theme/colors';
 
 type Props = {
   visible: boolean;
@@ -160,20 +161,23 @@ export function BookForm({ visible, initialBook, onClose, onSubmit, isSubmitting
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(44, 24, 16, 0.6)',
     justifyContent: 'center',
     padding: 16
   },
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 16,
-    maxHeight: '90%'
+    maxHeight: '90%',
+    borderWidth: 2,
+    borderColor: colors.border
   },
   header: {
     fontSize: 20,
     fontWeight: '700',
     paddingHorizontal: 20,
-    paddingTop: 20
+    paddingTop: 20,
+    color: colors.primary
   },
   content: {
     paddingHorizontal: 20,
@@ -182,43 +186,45 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: colors.textSecondary,
     marginTop: 12,
     marginBottom: 6
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderWidth: 2,
+    borderColor: colors.border,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 16,
-    color: '#111827'
+    color: colors.text,
+    backgroundColor: colors.background
   },
   statusGroup: {
     flexDirection: 'row'
   },
   statusButton: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderWidth: 2,
+    borderColor: colors.border,
     borderRadius: 10,
     paddingVertical: 12,
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: colors.background
   },
   statusButtonSpacing: {
     marginRight: 12
   },
   statusButtonActive: {
-    backgroundColor: '#2563EB',
-    borderColor: '#2563EB'
+    backgroundColor: colors.primary,
+    borderColor: colors.primary
   },
   statusText: {
-    color: '#111827',
+    color: colors.text,
     fontWeight: '600'
   },
   statusTextActive: {
-    color: '#fff'
+    color: colors.surface
   },
   footer: {
     flexDirection: 'row',
@@ -232,10 +238,10 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   cancelButton: {
-    backgroundColor: '#F3F4F6'
+    backgroundColor: colors.surfaceAlt
   },
   saveButton: {
-    backgroundColor: '#2563EB'
+    backgroundColor: colors.primary
   },
   buttonDisabled: {
     opacity: 0.7
@@ -243,10 +249,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff'
+    color: colors.surface
   },
   cancelText: {
-    color: '#1F2937'
+    color: colors.text
   }
 });
 
