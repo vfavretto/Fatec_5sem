@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { AuthorForm } from '../components/AuthorForm';
 import { AuthorListItem } from '../components/AuthorListItem';
+import { AuthorSearchModal } from '../components/AuthorSearchModal';
 import { useDatabase } from '../context/DatabaseContext';
 import { useAuthors } from '../hooks/useAuthors';
 import { Author, AuthorPayload } from '../types/author';
@@ -22,6 +23,7 @@ export function AuthorsScreen() {
   const { authors, isLoading, isSaving, error, refresh, addAuthor, editAuthor, removeAuthor } =
     useAuthors(selectedDatabase);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
 
   useEffect(() => {
@@ -61,17 +63,26 @@ export function AuthorsScreen() {
     setEditingAuthor(null);
   };
 
+  const handleImportAuthor = async (payload: AuthorPayload) => {
+    await addAuthor(payload);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
       <View style={styles.header}>
-        <View>
+        <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>Autores</Text>
           <Text style={styles.headerSubtitle}>Gerencie seus autores favoritos</Text>
         </View>
-        <Pressable style={[styles.headerButton, styles.addButton]} onPress={handleCreate}>
-          <Text style={styles.headerButtonText}>Novo autor</Text>
-        </Pressable>
+        <View style={styles.headerButtons}>
+          <Pressable style={[styles.headerButton, styles.searchButton]} onPress={() => setIsSearchVisible(true)}>
+            <Text style={styles.searchButtonText}>🔍 Buscar</Text>
+          </Pressable>
+          <Pressable style={[styles.headerButton, styles.addButton]} onPress={handleCreate}>
+            <Text style={styles.headerButtonText}>➕ Novo</Text>
+          </Pressable>
+        </View>
       </View>
 
       <FlatList
@@ -109,6 +120,12 @@ export function AuthorsScreen() {
         onSubmit={handleSubmit}
         isSubmitting={isSaving}
       />
+
+      <AuthorSearchModal
+        visible={isSearchVisible}
+        onClose={() => setIsSearchVisible(false)}
+        onImport={handleImportAuthor}
+      />
     </View>
   );
 }
@@ -126,6 +143,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 20
   },
+  headerInfo: {
+    flex: 1,
+    marginRight: 12
+  },
   headerTitle: {
     fontSize: 28,
     fontWeight: '800',
@@ -136,14 +157,27 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 15
   },
+  headerButtons: {
+    alignItems: 'flex-end',
+    gap: 8
+  },
   headerButton: {
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12
   },
   headerButtonText: {
-    fontWeight: '600',
-    color: colors.surface
+    fontWeight: '700',
+    color: colors.surface,
+    fontSize: 14
+  },
+  searchButton: {
+    backgroundColor: colors.secondary
+  },
+  searchButtonText: {
+    fontWeight: '700',
+    color: colors.text,
+    fontSize: 14
   },
   addButton: {
     backgroundColor: colors.primary
