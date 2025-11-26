@@ -8,18 +8,18 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { colors } from '../theme/colors';
-import { AuthorPayload } from '../types/author';
+import { MoviePayload } from '../types/movie';
 
 type Props = {
   visible: boolean;
-  author: AuthorPayload | null;
+  movie: MoviePayload | null;
   onClose(): void;
   onConfirm(): void;
   isSubmitting?: boolean;
 };
 
-export function AuthorPreviewModal({ visible, author, onClose, onConfirm, isSubmitting }: Props) {
-  if (!author) return null;
+export function MoviePreviewModal({ visible, movie, onClose, onConfirm, isSubmitting }: Props) {
+  if (!movie) return null;
 
   return (
     <Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
@@ -34,37 +34,29 @@ export function AuthorPreviewModal({ visible, author, onClose, onConfirm, isSubm
 
           <ScrollView style={styles.content}>
             <View style={styles.infoSection}>
-              <Text style={styles.label}>📝 Nome</Text>
-              <Text style={styles.value}>{author.nome}</Text>
+              <Text style={styles.label}>🎬 Título</Text>
+              <Text style={styles.value}>{movie.titulo}</Text>
             </View>
 
-            {author.anoNascimento && (
-              <View style={styles.infoSection}>
-                <Text style={styles.label}>📅 Ano de Nascimento</Text>
-                <Text style={styles.value}>{author.anoNascimento}</Text>
-              </View>
-            )}
+            <View style={styles.infoSection}>
+              <Text style={styles.label}>👤 Diretor</Text>
+              <Text style={styles.value}>{movie.diretor}</Text>
+            </View>
 
-            {author.nacionalidade && (
-              <View style={styles.infoSection}>
-                <Text style={styles.label}>🌍 Nacionalidade</Text>
-                <Text style={styles.value}>{author.nacionalidade}</Text>
-              </View>
-            )}
+            <View style={styles.infoSection}>
+              <Text style={styles.label}>📅 Ano</Text>
+              <Text style={styles.value}>{movie.ano}</Text>
+            </View>
 
-            {author.biografia && (
-              <View style={styles.infoSection}>
-                <Text style={styles.label}>📖 Biografia</Text>
-                <Text style={styles.bioValue}>{author.biografia}</Text>
-              </View>
-            )}
+            <View style={styles.infoSection}>
+              <Text style={styles.label}>🎭 Gênero</Text>
+              <Text style={styles.value}>{movie.genero}</Text>
+            </View>
 
-            {!author.biografia && !author.nacionalidade && !author.anoNascimento && (
-              <View style={styles.warningBox}>
-                <Text style={styles.warningIcon}>⚠️</Text>
-                <Text style={styles.warningText}>
-                  Apenas o nome do autor está disponível. Você pode editar depois para adicionar mais informações.
-                </Text>
+            {movie.notaPessoal !== undefined && (
+              <View style={styles.infoSection}>
+                <Text style={styles.label}>⭐ Nota</Text>
+                <Text style={styles.value}>{movie.notaPessoal.toFixed(1)}</Text>
               </View>
             )}
           </ScrollView>
@@ -85,7 +77,7 @@ export function AuthorPreviewModal({ visible, author, onClose, onConfirm, isSubm
               {isSubmitting ? (
                 <ActivityIndicator size="small" color={colors.surface} />
               ) : (
-                <Text style={styles.buttonText}>✓ Cadastrar Autor</Text>
+                <Text style={styles.buttonText}>✓ Cadastrar Filme</Text>
               )}
             </Pressable>
           </View>
@@ -159,32 +151,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     lineHeight: 26
-  },
-  bioValue: {
-    fontSize: 16,
-    color: colors.text,
-    lineHeight: 24,
-    textAlign: 'justify'
-  },
-  warningBox: {
-    backgroundColor: 'rgba(212, 175, 55, 0.15)',
-    borderLeftWidth: 4,
-    borderLeftColor: colors.warning,
-    padding: 16,
-    borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 8
-  },
-  warningIcon: {
-    fontSize: 20,
-    marginRight: 12
-  },
-  warningText: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20
   },
   footer: {
     flexDirection: 'row',

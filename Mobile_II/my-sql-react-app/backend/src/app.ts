@@ -1,7 +1,7 @@
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import bookRoutes from './routes/bookRoutes';
-import authorRoutes from './routes/authorRoutes';
+import movieRoutes from './routes/movieRoutes';
 
 const app = express();
 
@@ -13,7 +13,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/books', bookRoutes);
-app.use('/api/authors', authorRoutes);
+app.use('/api/movies', movieRoutes);
 
 app.use((error: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('[Erro API Livros]', error);

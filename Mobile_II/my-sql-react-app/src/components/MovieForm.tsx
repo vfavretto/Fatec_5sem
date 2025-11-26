@@ -9,73 +9,98 @@ import {
   TextInput,
   View
 } from 'react-native';
-import { Author, AuthorPayload } from '../types/author';
+import { Movie, MoviePayload } from '../types/movie';
 import { colors } from '../theme/colors';
 
 type Props = {
   visible: boolean;
-  initialAuthor?: Author | null;
+  initialMovie?: Movie | null;
   onClose(): void;
-  onSubmit(payload: AuthorPayload): Promise<void>;
+  onSubmit(payload: MoviePayload): Promise<void>;
   isSubmitting?: boolean;
 };
 
 type FormState = {
-  nome: string;
-  biografia: string;
-  nacionalidade: string;
-  anoNascimento: string;
+  titulo: string;
+  diretor: string;
+  ano: string;
+  genero: string;
+  notaPessoal: string;
 };
 
 const defaultState: FormState = {
-  nome: '',
-  biografia: '',
-  nacionalidade: '',
-  anoNascimento: ''
+  titulo: '',
+  diretor: '',
+  ano: '',
+  genero: '',
+  notaPessoal: ''
 };
 
-export function AuthorForm({ visible, initialAuthor, onClose, onSubmit, isSubmitting }: Props) {
+export function MovieForm({ visible, initialMovie, onClose, onSubmit, isSubmitting }: Props) {
   const [form, setForm] = useState<FormState>(defaultState);
 
   useEffect(() => {
-    if (initialAuthor) {
+    if (initialMovie) {
       setForm({
-        nome: initialAuthor.nome,
-        biografia: initialAuthor.biografia ?? '',
-        nacionalidade: initialAuthor.nacionalidade ?? '',
-        anoNascimento: initialAuthor.anoNascimento ? String(initialAuthor.anoNascimento) : ''
+        titulo: initialMovie.titulo,
+        diretor: initialMovie.diretor,
+        ano: String(initialMovie.ano),
+        genero: initialMovie.genero,
+        notaPessoal: initialMovie.notaPessoal ? String(initialMovie.notaPessoal) : ''
       });
     } else {
       setForm(defaultState);
     }
-  }, [initialAuthor, visible]);
+  }, [initialMovie, visible]);
 
   const title = useMemo(
-    () => (initialAuthor ? 'Editar autor' : 'Novo autor'),
-    [initialAuthor]
+    () => (initialMovie ? 'Editar filme' : 'Novo filme'),
+    [initialMovie]
   );
 
   const handleSubmit = async () => {
-    if (!form.nome.trim()) {
-      Alert.alert('Atenção', 'Informe o nome do autor.');
+    if (!form.titulo.trim()) {
+      Alert.alert('Atenção', 'Informe o título do filme.');
       return;
     }
 
-    let anoNumber: number | undefined;
-    if (form.anoNascimento.trim().length > 0) {
-      const parsed = Number(form.anoNascimento);
-      if (Number.isNaN(parsed) || parsed < 1000 || parsed > new Date().getFullYear()) {
-        Alert.alert('Atenção', 'Ano de nascimento inválido.');
+    if (!form.diretor.trim()) {
+      Alert.alert('Atenção', 'Informe o diretor do filme.');
+      return;
+    }
+
+    if (!form.ano.trim()) {
+      Alert.alert('Atenção', 'Informe o ano do filme.');
+      return;
+    }
+
+    const anoNumber = Number(form.ano);
+    if (Number.isNaN(anoNumber) || anoNumber < 1888 || anoNumber > new Date().getFullYear() + 5) {
+      Alert.alert('Atenção', 'Ano inválido. Deve estar entre 1888 e ' + (new Date().getFullYear() + 5));
+      return;
+    }
+
+    if (!form.genero.trim()) {
+      Alert.alert('Atenção', 'Informe o gênero do filme.');
+      return;
+    }
+
+    let notaNumber: number | undefined;
+    if (form.notaPessoal.trim().length > 0) {
+      const parsed = Number(form.notaPessoal);
+      if (Number.isNaN(parsed) || parsed < 0 || parsed > 10) {
+        Alert.alert('Atenção', 'Nota pessoal deve estar entre 0 e 10.');
         return;
       }
-      anoNumber = parsed;
+      notaNumber = parsed;
     }
 
     await onSubmit({
-      nome: form.nome.trim(),
-      biografia: form.biografia.trim() || undefined,
-      nacionalidade: form.nacionalidade.trim() || undefined,
-      anoNascimento: anoNumber
+      titulo: form.titulo.trim(),
+      diretor: form.diretor.trim(),
+      ano: anoNumber,
+      genero: form.genero.trim(),
+      notaPessoal: notaNumber
     });
 
     setForm(defaultState);
@@ -87,39 +112,46 @@ export function AuthorForm({ visible, initialAuthor, onClose, onSubmit, isSubmit
         <View style={styles.container}>
           <Text style={styles.header}>{title}</Text>
           <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
-            <Text style={styles.label}>Nome</Text>
+            <Text style={styles.label}>Título</Text>
             <TextInput
               style={styles.input}
-              placeholder="Ex.: Machado de Assis"
-              value={form.nome}
-              onChangeText={(value) => setForm((prev) => ({ ...prev, nome: value }))}
+              placeholder="Ex.: O Poderoso Chefão"
+              value={form.titulo}
+              onChangeText={(value) => setForm((prev) => ({ ...prev, titulo: value }))}
             />
 
-            <Text style={styles.label}>Biografia (opcional)</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Breve biografia do autor..."
-              multiline
-              numberOfLines={4}
-              value={form.biografia}
-              onChangeText={(value) => setForm((prev) => ({ ...prev, biografia: value }))}
-            />
-
-            <Text style={styles.label}>Nacionalidade (opcional)</Text>
+            <Text style={styles.label}>Diretor</Text>
             <TextInput
               style={styles.input}
-              placeholder="Ex.: Brasileiro"
-              value={form.nacionalidade}
-              onChangeText={(value) => setForm((prev) => ({ ...prev, nacionalidade: value }))}
+              placeholder="Ex.: Francis Ford Coppola"
+              value={form.diretor}
+              onChangeText={(value) => setForm((prev) => ({ ...prev, diretor: value }))}
             />
 
-            <Text style={styles.label}>Ano de Nascimento (opcional)</Text>
+            <Text style={styles.label}>Ano</Text>
             <TextInput
               style={styles.input}
-              placeholder="Ex.: 1839"
+              placeholder="Ex.: 1972"
               keyboardType="number-pad"
-              value={form.anoNascimento}
-              onChangeText={(value) => setForm((prev) => ({ ...prev, anoNascimento: value }))}
+              value={form.ano}
+              onChangeText={(value) => setForm((prev) => ({ ...prev, ano: value }))}
+            />
+
+            <Text style={styles.label}>Gênero</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex.: Drama, Ação, Comédia"
+              value={form.genero}
+              onChangeText={(value) => setForm((prev) => ({ ...prev, genero: value }))}
+            />
+
+            <Text style={styles.label}>Minha Nota (0-10) - Opcional</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex.: 8.5"
+              keyboardType="decimal-pad"
+              value={form.notaPessoal}
+              onChangeText={(value) => setForm((prev) => ({ ...prev, notaPessoal: value }))}
             />
           </ScrollView>
 
@@ -182,10 +214,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
     backgroundColor: colors.background
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top'
   },
   footer: {
     flexDirection: 'row',

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { BookListScreen } from '../screens/BookListScreen';
-import { AuthorsScreen } from '../screens/AuthorsScreen';
+import { MoviesScreen } from '../screens/MoviesScreen';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../theme/colors';
 
-type Screen = 'books' | 'authors';
+type Screen = 'books' | 'movies';
 
 export function MainNavigator() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('books');
@@ -23,18 +23,18 @@ export function MainNavigator() {
         </Pressable>
 
         <Pressable
-          style={[styles.tab, currentScreen === 'authors' && styles.tabActive]}
-          onPress={() => setCurrentScreen('authors')}
+          style={[styles.tab, currentScreen === 'movies' && styles.tabActive]}
+          onPress={() => setCurrentScreen('movies')}
         >
-          <Text style={styles.tabIcon}>✍️</Text>
-          <Text style={[styles.tabText, currentScreen === 'authors' && styles.tabTextActive]}>
-            Autores
+          <Text style={styles.tabIcon}>🎬</Text>
+          <Text style={[styles.tabText, currentScreen === 'movies' && styles.tabTextActive]}>
+            Filmes
           </Text>
         </Pressable>
       </View>
 
       <View style={styles.content}>
-        {currentScreen === 'books' ? <BookListScreen /> : <AuthorsScreen />}
+        {currentScreen === 'books' ? <BookListScreen /> : <MoviesScreen />}
       </View>
     </View>
   );

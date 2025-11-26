@@ -1,17 +1,18 @@
 import { getSqliteDatabase, sqliteHelpers } from './sqlite';
 
-export async function ensureAuthorsSchema() {
+export async function ensureMoviesSchema() {
   const db = await getSqliteDatabase();
   
   await sqliteHelpers.run(
     db,
     `
-    CREATE TABLE IF NOT EXISTS authors (
+    CREATE TABLE IF NOT EXISTS movies (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nome TEXT NOT NULL,
-      biografia TEXT,
-      nacionalidade TEXT,
-      ano_nascimento INTEGER,
+      titulo TEXT NOT NULL,
+      diretor TEXT NOT NULL,
+      ano INTEGER NOT NULL,
+      genero TEXT NOT NULL,
+      nota_pessoal REAL,
       criado_em TEXT NOT NULL DEFAULT (datetime('now')),
       atualizado_em TEXT NOT NULL DEFAULT (datetime('now'))
     );

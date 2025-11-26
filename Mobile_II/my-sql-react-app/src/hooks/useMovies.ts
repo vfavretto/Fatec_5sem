@@ -1,50 +1,50 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { createAuthor, deleteAuthor, listAuthors, updateAuthor } from '../api/authors';
-import { Author, AuthorPayload } from '../types/author';
+import { createMovie, deleteMovie, listMovies, updateMovie } from '../api/movies';
+import { Movie, MoviePayload } from '../types/movie';
 import { DatabaseDriver } from '../types/database';
 
-type UseAuthorsResult = {
-  authors: Author[];
+type UseMoviesResult = {
+  movies: Movie[];
   isLoading: boolean;
   isSaving: boolean;
   error: string | null;
   refresh(): Promise<void>;
-  addAuthor(payload: AuthorPayload): Promise<void>;
-  editAuthor(id: string, payload: AuthorPayload): Promise<void>;
-  removeAuthor(id: string): Promise<void>;
+  addMovie(payload: MoviePayload): Promise<void>;
+  editMovie(id: string, payload: MoviePayload): Promise<void>;
+  removeMovie(id: string): Promise<void>;
 };
 
-export function useAuthors(driver: DatabaseDriver | null): UseAuthorsResult {
-  const [authors, setAuthors] = useState<Author[]>([]);
+export function useMovies(driver: DatabaseDriver | null): UseMoviesResult {
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAuthors = useCallback(async () => {
+  const fetchMovies = useCallback(async () => {
     if (!driver) {
-      setAuthors([]);
+      setMovies([]);
       return;
     }
     setIsLoading(true);
     try {
-      const data = await listAuthors(driver);
-      setAuthors(data);
+      const data = await listMovies(driver);
+      setMovies(data);
       setError(null);
     } catch (err) {
-      console.error('Erro ao carregar autores', err);
-      setError('Não foi possível carregar os autores.');
+      console.error('Erro ao carregar filmes', err);
+      setError('Não foi possível carregar os filmes.');
     } finally {
       setIsLoading(false);
     }
   }, [driver]);
 
   useEffect(() => {
-    fetchAuthors();
-  }, [fetchAuthors]);
+    fetchMovies();
+  }, [fetchMovies]);
 
   const refresh = useCallback(async () => {
-    await fetchAuthors();
-  }, [fetchAuthors]);
+    await fetchMovies();
+  }, [fetchMovies]);
 
   const runMutation = useCallback(
     async (action: () => Promise<void>) => {
@@ -56,43 +56,43 @@ export function useAuthors(driver: DatabaseDriver | null): UseAuthorsResult {
       try {
         await action();
         setError(null);
-        await fetchAuthors();
+        await fetchMovies();
       } catch (err) {
-        console.error('Erro ao salvar autor', err);
+        console.error('Erro ao salvar filme', err);
         setError('Não foi possível salvar as alterações.');
         throw err;
       } finally {
         setIsSaving(false);
       }
     },
-    [driver, fetchAuthors]
+    [driver, fetchMovies]
   );
 
-  const addAuthor = useCallback(
-    async (payload: AuthorPayload) => {
+  const addMovie = useCallback(
+    async (payload: MoviePayload) => {
       await runMutation(async () => {
         if (!driver) return;
-        await createAuthor(driver, payload);
+        await createMovie(driver, payload);
       });
     },
     [driver, runMutation]
   );
 
-  const editAuthor = useCallback(
-    async (id: string, payload: AuthorPayload) => {
+  const editMovie = useCallback(
+    async (id: string, payload: MoviePayload) => {
       await runMutation(async () => {
         if (!driver) return;
-        await updateAuthor(driver, id, payload);
+        await updateMovie(driver, id, payload);
       });
     },
     [driver, runMutation]
   );
 
-  const removeAuthor = useCallback(
+  const removeMovie = useCallback(
     async (id: string) => {
       await runMutation(async () => {
         if (!driver) return;
-        await deleteAuthor(driver, id);
+        await deleteMovie(driver, id);
       });
     },
     [driver, runMutation]
@@ -100,16 +100,16 @@ export function useAuthors(driver: DatabaseDriver | null): UseAuthorsResult {
 
   return useMemo(
     () => ({
-      authors,
+      movies,
       isLoading,
       isSaving,
       error,
       refresh,
-      addAuthor,
-      editAuthor,
-      removeAuthor
+      addMovie,
+      editMovie,
+      removeMovie
     }),
-    [authors, isLoading, isSaving, error, refresh, addAuthor, editAuthor, removeAuthor]
+    [movies, isLoading, isSaving, error, refresh, addMovie, editMovie, removeMovie]
   );
 }
 

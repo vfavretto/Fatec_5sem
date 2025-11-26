@@ -10,21 +10,21 @@ import {
   Text,
   View
 } from 'react-native';
-import { AuthorForm } from '../components/AuthorForm';
-import { AuthorListItem } from '../components/AuthorListItem';
-import { AuthorSearchModal } from '../components/AuthorSearchModal';
+import { MovieForm } from '../components/MovieForm';
+import { MovieListItem } from '../components/MovieListItem';
+import { MovieSearchModal } from '../components/MovieSearchModal';
 import { useDatabase } from '../context/DatabaseContext';
-import { useAuthors } from '../hooks/useAuthors';
-import { Author, AuthorPayload } from '../types/author';
+import { useMovies } from '../hooks/useMovies';
+import { Movie, MoviePayload } from '../types/movie';
 import { colors } from '../theme/colors';
 
-export function AuthorsScreen() {
+export function MoviesScreen() {
   const { selectedDatabase } = useDatabase();
-  const { authors, isLoading, isSaving, error, refresh, addAuthor, editAuthor, removeAuthor } =
-    useAuthors(selectedDatabase);
+  const { movies, isLoading, isSaving, error, refresh, addMovie, editMovie, removeMovie } =
+    useMovies(selectedDatabase);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
+  const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
 
   useEffect(() => {
     if (error) {
@@ -33,38 +33,38 @@ export function AuthorsScreen() {
   }, [error]);
 
   const handleCreate = () => {
-    setEditingAuthor(null);
+    setEditingMovie(null);
     setIsFormVisible(true);
   };
 
-  const handleEdit = (author: Author) => {
-    setEditingAuthor(author);
+  const handleEdit = (movie: Movie) => {
+    setEditingMovie(movie);
     setIsFormVisible(true);
   };
 
-  const handleDelete = (author: Author) => {
-    Alert.alert('Confirmação', `Deseja excluir "${author.nome}"?`, [
+  const handleDelete = (movie: Movie) => {
+    Alert.alert('Confirmação', `Deseja excluir "${movie.titulo}"?`, [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Excluir',
         style: 'destructive',
-        onPress: () => removeAuthor(author.id).catch(() => null)
+        onPress: () => removeMovie(movie.id).catch(() => null)
       }
     ]);
   };
 
-  const handleSubmit = async (payload: AuthorPayload) => {
-    if (editingAuthor) {
-      await editAuthor(editingAuthor.id, payload);
+  const handleSubmit = async (payload: MoviePayload) => {
+    if (editingMovie) {
+      await editMovie(editingMovie.id, payload);
     } else {
-      await addAuthor(payload);
+      await addMovie(payload);
     }
     setIsFormVisible(false);
-    setEditingAuthor(null);
+    setEditingMovie(null);
   };
 
-  const handleImportAuthor = async (payload: AuthorPayload) => {
-    await addAuthor(payload);
+  const handleImportMovie = async (payload: MoviePayload): Promise<void> => {
+    await addMovie(payload);
   };
 
   return (
@@ -72,8 +72,8 @@ export function AuthorsScreen() {
       <StatusBar style="dark" />
       <View style={styles.header}>
         <View style={styles.headerInfo}>
-          <Text style={styles.headerTitle}>Autores</Text>
-          <Text style={styles.headerSubtitle}>Gerencie seus autores favoritos</Text>
+          <Text style={styles.headerTitle}>Filmes</Text>
+          <Text style={styles.headerSubtitle}>Gerencie sua coleção de filmes</Text>
         </View>
         <View style={styles.headerButtons}>
           <Pressable style={[styles.headerButton, styles.searchButton]} onPress={() => setIsSearchVisible(true)}>
@@ -86,45 +86,45 @@ export function AuthorsScreen() {
       </View>
 
       <FlatList
-        data={authors}
+        data={movies}
         keyExtractor={(item) => item.id}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
-        contentContainerStyle={authors.length === 0 ? styles.emptyContent : styles.listContent}
+        contentContainerStyle={movies.length === 0 ? styles.emptyContent : styles.listContent}
         renderItem={({ item }) => (
-          <AuthorListItem author={item} onEdit={handleEdit} onDelete={handleDelete} />
+          <MovieListItem movie={item} onEdit={handleEdit} onDelete={handleDelete} />
         )}
         ListEmptyComponent={
           isLoading ? (
             <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
           ) : (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>Nenhum autor cadastrado</Text>
+              <Text style={styles.emptyTitle}>Nenhum filme cadastrado</Text>
               <Text style={styles.emptySubtitle}>
-                Adicione autores para acompanhar suas obras e biografias.
+                Adicione filmes para acompanhar sua coleção e avaliações.
               </Text>
               <Pressable style={[styles.headerButton, styles.addButton]} onPress={handleCreate}>
-                <Text style={styles.headerButtonText}>Cadastrar primeiro autor</Text>
+                <Text style={styles.headerButtonText}>Cadastrar primeiro filme</Text>
               </Pressable>
             </View>
           )
         }
       />
 
-      <AuthorForm
+      <MovieForm
         visible={isFormVisible}
-        initialAuthor={editingAuthor}
+        initialMovie={editingMovie}
         onClose={() => {
           setIsFormVisible(false);
-          setEditingAuthor(null);
+          setEditingMovie(null);
         }}
         onSubmit={handleSubmit}
         isSubmitting={isSaving}
       />
 
-      <AuthorSearchModal
+      <MovieSearchModal
         visible={isSearchVisible}
         onClose={() => setIsSearchVisible(false)}
-        onImport={handleImportAuthor}
+        onImport={handleImportMovie}
       />
     </View>
   );

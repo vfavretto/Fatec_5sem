@@ -1,14 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import {
-  authorPayloadSchema,
-  authorUpdateSchema
-} from '../schemas/authorSchema';
-import { getAuthorService } from '../services/authorServiceFactory';
-import { normalizeDriver } from '../services/bookServiceFactory';
-import { AuthorService, DatabaseDriver } from '../services/authorTypes';
+  moviePayloadSchema,
+  movieUpdateSchema
+} from '../schemas/movieSchema';
+import { getMovieService, normalizeDriver } from '../services/movieServiceFactory';
+import { MovieService, DatabaseDriver } from '../services/movieTypes';
 
-interface AuthorRequest extends Request {
-  authorService?: AuthorService;
+interface MovieRequest extends Request {
+  movieService?: MovieService;
   dbDriver?: DatabaseDriver;
 }
 
@@ -21,11 +20,11 @@ function getDriverParam(req: Request) {
   return typeof param === 'string' ? param : undefined;
 }
 
-async function attachService(req: AuthorRequest, _res: Response, next: NextFunction) {
+async function attachService(req: MovieRequest, _res: Response, next: NextFunction) {
   try {
     const driverParam = getDriverParam(req);
     req.dbDriver = normalizeDriver(driverParam);
-    req.authorService = await getAuthorService(req.dbDriver);
+    req.movieService = await getMovieService(req.dbDriver);
     next();
   } catch (error) {
     next(error);
@@ -33,8 +32,8 @@ async function attachService(req: AuthorRequest, _res: Response, next: NextFunct
 }
 
 const asyncHandler =
-  (handler: (req: AuthorRequest, res: Response) => Promise<void>) =>
-  (req: AuthorRequest, res: Response, next: NextFunction) => {
+  (handler: (req: MovieRequest, res: Response) => Promise<void>) =>
+  (req: MovieRequest, res: Response, next: NextFunction) => {
     handler(req, res).catch(next);
   };
 
@@ -45,20 +44,20 @@ router.use(attachService);
 router.get(
   '/',
   asyncHandler(async (req, res) => {
-    const authors = await req.authorService!.list();
-    res.json({ data: authors, driver: req.dbDriver });
+    const movies = await req.movieService!.list();
+    res.json({ data: movies, driver: req.dbDriver });
   })
 );
 
 router.get(
   '/:id',
   asyncHandler(async (req, res) => {
-    const author = await req.authorService!.getById(req.params.id);
-    if (!author) {
-      res.status(404).json({ message: 'Autor não encontrado.' });
+    const movie = await req.movieService!.getById(req.params.id);
+    if (!movie) {
+      res.status(404).json({ message: 'Filme não encontrado.' });
       return;
     }
-    res.json({ data: author, driver: req.dbDriver });
+    res.json({ data: movie, driver: req.dbDriver });
   })
 );
 
@@ -66,8 +65,8 @@ router.post(
   '/',
   asyncHandler(async (req, res) => {
     try {
-      const payload = authorPayloadSchema.parse(req.body);
-      const created = await req.authorService!.create(payload);
+      const payload = moviePayloadSchema.parse(req.body);
+      const created = await req.movieService!.create(payload);
       res.status(201).json({ data: created, driver: req.dbDriver });
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -86,8 +85,8 @@ router.put(
   '/:id',
   asyncHandler(async (req, res) => {
     try {
-      const payload = authorUpdateSchema.parse(req.body);
-      const updated = await req.authorService!.update(req.params.id, payload);
+      const payload = movieUpdateSchema.parse(req.body);
+      const updated = await req.movieService!.update(req.params.id, payload);
       res.json({ data: updated, driver: req.dbDriver });
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -97,7 +96,7 @@ router.put(
         });
         return;
       }
-      if (error.message === 'Autor não encontrado.') {
+      if (error.message === 'Filme não encontrado.') {
         res.status(404).json({ message: error.message });
         return;
       }
@@ -110,10 +109,10 @@ router.delete(
   '/:id',
   asyncHandler(async (req, res) => {
     try {
-      await req.authorService!.remove(req.params.id);
+      await req.movieService!.remove(req.params.id);
       res.status(204).send();
     } catch (error: any) {
-      if (error.message === 'Autor não encontrado.') {
+      if (error.message === 'Filme não encontrado.') {
         res.status(404).json({ message: error.message });
         return;
       }

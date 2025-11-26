@@ -1,40 +1,38 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Author } from '../types/author';
+import { Movie } from '../types/movie';
 import { colors } from '../theme/colors';
 
 type Props = {
-  author: Author;
-  onEdit(author: Author): void;
-  onDelete(author: Author): void;
+  movie: Movie;
+  onEdit(movie: Movie): void;
+  onDelete(movie: Movie): void;
 };
 
-export function AuthorListItem({ author, onEdit, onDelete }: Props) {
+export function MovieListItem({ movie, onEdit, onDelete }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.name}>{author.nome}</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{movie.titulo}</Text>
+          {movie.notaPessoal !== undefined && (
+            <View style={styles.ratingBadge}>
+              <Text style={styles.ratingText}>⭐ {movie.notaPessoal.toFixed(1)}</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       <View style={styles.details}>
-        {author.nacionalidade && (
-          <Text style={styles.detailText}>🌍 {author.nacionalidade}</Text>
-        )}
-        {author.anoNascimento && (
-          <Text style={styles.detailText}>📅 {author.anoNascimento}</Text>
-        )}
+        <Text style={styles.detailText}>🎬 {movie.diretor}</Text>
+        <Text style={styles.detailText}>📅 {movie.ano}</Text>
+        <Text style={styles.detailText}>🎭 {movie.genero}</Text>
       </View>
 
-      {author.biografia && (
-        <Text style={styles.bio} numberOfLines={2}>
-          {author.biografia}
-        </Text>
-      )}
-
       <View style={styles.actions}>
-        <Pressable style={[styles.actionButton, styles.editButton]} onPress={() => onEdit(author)}>
+        <Pressable style={[styles.actionButton, styles.editButton]} onPress={() => onEdit(movie)}>
           <Text style={[styles.actionText, styles.editText]}>Editar</Text>
         </Pressable>
-        <Pressable style={[styles.actionButton, styles.deleteButton]} onPress={() => onDelete(author)}>
+        <Pressable style={[styles.actionButton, styles.deleteButton]} onPress={() => onDelete(movie)}>
           <Text style={[styles.actionText, styles.deleteText]}>Excluir</Text>
         </Pressable>
       </View>
@@ -59,26 +57,38 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 8
   },
-  name: {
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12
+  },
+  title: {
+    flex: 1,
     fontSize: 20,
+    fontWeight: '700',
+    color: colors.text
+  },
+  ratingBadge: {
+    backgroundColor: colors.secondary,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8
+  },
+  ratingText: {
+    fontSize: 14,
     fontWeight: '700',
     color: colors.text
   },
   details: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
-    marginBottom: 8
+    marginBottom: 12
   },
   detailText: {
     fontSize: 14,
     color: colors.textSecondary
-  },
-  bio: {
-    marginTop: 4,
-    marginBottom: 12,
-    color: colors.textMuted,
-    fontSize: 14,
-    lineHeight: 20
   },
   actions: {
     flexDirection: 'row',
